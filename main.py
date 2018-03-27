@@ -1,32 +1,30 @@
-import scoket
-import thread
+import socket
+import log
+import requesthandler
 import time
-import request_hadler
-import log_files
+#import sys
+#import thread
+#import args
 
-cofigurations = open('settings.conf','r')
-list_of_config = []
+sock =socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
-for i in configurations.readlines():
-    list_of_config.append(i)
-    list_of_config[
+sock.bind(('127.0.0.1',80))
+
+sock.listen(5)
+
+print ("python server started.....")
+
+while True:
+    connection, address = sock.accept()
     
-socket_listining = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    request = connection.recv(4096)
 
-socket_listining.bind((ip_adresses,port))
+    response = requesthandler.requesthandler(str(request))
 
-socket_listining.listen(5)
+    connection.send(response)
 
-connection,client_address = socket_listining.accept()
+    log.log(address,str(time.ctime()),request)
 
-request_recived = connection.recv(4096)
-
-request_handler.request_handler(request_recived)
-
-log_files.log(client_address,time.ctime())
-
-
-
-
-
-
+    connection.close()
+    
+sock.close()
