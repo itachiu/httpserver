@@ -1,10 +1,17 @@
 import time
+import os
 
 def requesthandler(request):
+    
+    file_location = "/web/index.html"
+    
+    path =os.getcwd()+file_location
+    
+    index_page = open(path, 'r')
 
-	status_flag = False
-
-	status_code = {
+    status_flag = False
+    
+    status_code = {
                	'100':'continue',
                 '101':'Switching Protocals',
                 '200':'OK',
@@ -31,44 +38,46 @@ def requesthandler(request):
                 }
 
 
-	request_dismantle = request.split('\n')
+    request_dismantle = request.split('\n')
 	#print request_dismatle[0]
-	l = request_dismantle[0].split(' ')
-	request_method = l[0]
-	request_http_version = l[-1]
-	request_dismantle = request_dismantle[1:]
+    l = request_dismantle[0].split(' ')
+    request_method = l[0]
+    request_http_version = l[-1]
+    request_dismantle = request_dismantle[1:]
 
-	for i in request_dismantle:
-		request_charaters = i.split(':')
+    for i in request_dismantle:
+        request_charaters = i.split(':')
+    
+    
+   
+    
 
 
-	index_page = open('index.html', 'r')
+    if 'GET' in request_method:
+        code = '200'
+        status_codes = status_code['200']
+        if 'HTTP/1.1' in request_http_version:
+            response_http_version = 'HTTP/1.1'
+        elif 'HTTP/1.0' in request_http_version:
+            response_http_version = 'HTTP/1.0'
+    else:
+        code = '405'
+        status_codes = status_code['405']
+        status_flag = True
 
-	if 'GET' in request_method:
-		code = '200'
-		status_codes = status_code['200']
-		if 'HTTP/1.1' in request_http_version:
-			response_http_version = 'HTTP/1.1'
-		elif 'HTTP/1.0' in request_http_version:
-			response_http_version = 'HTTP/1.0'
-	else:
-		code = '405'
-		status_codes = status_code['405']
-		status_flag = True
+    Date = 'Date: '+str(time.ctime())+' IST\n'
 
-	Date = 'Date: '+str(time.ctime())+' IST\n'
+    server = 'Server: Python Server\n'
 
-	server = 'Server: Python Server\n'
+    Last_modified = 'Last-modified: SUN, 4 Mar 2018, 8:38:33 PM IST\n'
 
-	Last_modified = 'Last-modified: SUN, 4 Mar 2018, 8:38:33 PM IST\n'
+    Content_Type = 'Content-Type: text/html\n'
 
-	Content_Type = 'Content-Type: text/html\n'
+    Connection =  'Conncetion: Closed\n'
 
-	Connection =  'Conncetion: Closed\n'
+    response_body = Date+server+Last_modified+Content_Type+Connection
 
-	response_body = Date+server+Last_modified+Content_Type+Connection
+    response_header = response_http_version+' '+str(code)+' '+str(status_codes)
+    response = response_header+"\n"+response_body+str(index_page.read())
 
-	response_header = response_http_version+' '+str(code)+' '+str(status_codes)
-	response = response_header+"\n"+response_body+str(index_page.read())
-
-	return response
+    return response
